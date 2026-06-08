@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>City Selector</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      label {
+        font-weight: bold;
+        display: block;
+        margin-top: 15px;
+      }
+      h2 {
+        color: #333;
+      }
+      #selected-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f0f0f0;
+        border-radius: 5px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Select Your Location</h2>
+
+    <label>Country</label>
+    <select id="country" onchange="loadStates()">
+      <option value="">-- Select Country --</option>
+    </select>
+
+    <label>State</label>
+    <select id="state" onchange="loadCities()" disabled>
+      <option value="">-- Select State --</option>
+    </select>
+
+    <label>City</label>
+    <select id="city" onchange="showSelected()" disabled>
+      <option value="">-- Select City --</option>
+    </select>
+
+    <div id="selected-info">
+      <strong>Selected:</strong> <span id="selected-text"></span>
+    </div>
+
+    <script>
+      const API = "http://127.0.0.1:8000/api/locations";
+
+      async function loadCountries() {
+        const res = await fetch(`${API}/countries/`);
+        const data = await res.json();
+        const select = document.getElementById("country");
+        data.forEach((c) => {
+          select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+      }
+
+      async function loadStates() {
+        const countryId = document.getElementById("country").value;
+        const stateSelect = document.getElementById("state");
+        const citySelect = document.getElementById("city");
+
+        stateSelect.innerHTML = '<option value="">-- Select State --</option>';
+        citySelect.innerHTML = '<option value="">-- Select City --</option>';
+        citySelect.disabled = true;
+        document.getElementById("selected-info").style.display = "none";
+
+        if (!countryId) {
+          stateSelect.disabled = true;
+          return;
+        }
+
+        const res = await fetch(`${API}/states/?country_id=${countryId}`);
+        const data = await res.json();
+        data.forEach((s) => {
+          stateSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+        });
+        stateSelect.disabled = false;
+      }
+
+      async function loadCities() {
+        const stateId = document.getElementById("state").value;
+        const citySelect = document.getElementById("city");
+
+        citySelect.innerHTML = '<option value="">-- Select City --</option>';
+        document.getElementById("selected-info").style.display = "none";
+
+        if (!stateId) {
+          citySelect.disabled = true;
+          return;
+        }
+
+        const res = await fetch(`${API}/cities/?state_id=${stateId}`);
+        const data = await res.json();
+        data.forEach((c) => {
+          citySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+        citySelect.disabled = false;
+      }
+
+      function showSelected() {
+        const country = document.getElementById("country");
+        const state = document.getElementById("state");
+        const city = document.getElementById("city");
+        if (!city.value) return;
+        const info = document.getElementById("selected-info");
+        document.getElementById("selected-text").textContent =
+          `${country.options[country.selectedIndex].text} → ${state.options[state.selectedIndex].text} → ${city.options[city.selectedIndex].text}`;
+        info.style.display = "block";
+      }
+
+      loadCountries();
+    </script>
+  </body>
+</html>
