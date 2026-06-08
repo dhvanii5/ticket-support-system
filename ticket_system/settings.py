@@ -129,6 +129,6 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'escalate-stale-tickets': {
         'task': 'tickets.tasks.escalate_stale_tickets',
-        'schedule': crontab(minute='*/30'),  # runs every 30 mins
+        'schedule': crontab(minute='*/30'),
     },
 }

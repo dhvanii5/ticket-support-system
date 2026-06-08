@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Ticket
 from accounts.serializers import UserSerializer
-from locations.serializers import CountrySerializer, StateSerializer, CitySerializer
 
 class TicketSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
@@ -21,6 +20,21 @@ class TicketCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'priority', 'country', 'state', 'city']
+
+    def validate(self, data):
+        country = data.get('country')
+        state = data.get('state')
+        city = data.get('city')
+
+        if state and country and state.country != country:
+            raise serializers.ValidationError(
+                "State does not belong to the selected country."
+            )
+        if city and state and city.state != state:
+            raise serializers.ValidationError(
+                "City does not belong to the selected state."
+            )
+        return data
 
     def create(self, validated_data):
         from django.utils import timezone

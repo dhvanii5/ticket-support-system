@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.utils import timezone
-from .models import Ticket
+from tickets.models import Ticket
 from audit.models import AuditLog
 
 @shared_task

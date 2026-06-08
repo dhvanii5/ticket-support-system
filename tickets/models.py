@@ -31,9 +31,9 @@ class Ticket(models.Model):
         null=True, blank=True, related_name='assigned_tickets'
     )
 
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, null=True)
-    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
-    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    country = models.ForeignKey(Country, on_delete=models.PROTECT)
+    state = models.ForeignKey(State, on_delete=models.PROTECT)
+    city = models.ForeignKey(City, on_delete=models.PROTECT)
 
     last_action_at = models.DateTimeField(auto_now_add=True)
     escalation_deadline = models.DateTimeField(null=True, blank=True)
