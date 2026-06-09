@@ -59,6 +59,9 @@ class TicketViewSet(viewsets.ModelViewSet):
         ticket.assigned_to = agent
         ticket.status = 'ASSIGNED'
         ticket.last_action_at = timezone.now()
+        # Reset the escalation clock — agent gets a fresh window from assignment time
+        from datetime import timedelta
+        ticket.escalation_deadline = timezone.now() + timedelta(minutes=2)
         ticket.save()
         AuditLog.objects.create(
             ticket=ticket, performed_by=request.user,

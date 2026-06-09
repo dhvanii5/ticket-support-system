@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Ticket
 from accounts.serializers import UserSerializer
+from locations import services as location_services
+from locations.services import LocationAPIError
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -38,6 +40,39 @@ class TicketCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("City is required.")
         return value.strip()
 
+    def validate(self, data):
+        """Ensure the provided country/state/city exist according to the
+        Location service. This enforces that clients cannot submit arbitrary
+        free-text locations."""
+        country = data.get('country')
+        state = data.get('state')
+        city = data.get('city')
+
+        # Basic presence already validated by field validators above
+        try:
+            states = location_services.get_states(country)
+        except LocationAPIError as exc:
+            raise serializers.ValidationError({
+                'country': f'Location service unavailable: {exc}'
+            })
+
+        state_names = {s['name'] for s in states}
+        if state not in state_names:
+            raise serializers.ValidationError({'state': 'State not found for country.'})
+
+        try:
+            cities = location_services.get_cities(state, country)
+        except LocationAPIError as exc:
+            raise serializers.ValidationError({
+                'city': f'Location service unavailable: {exc}'
+            })
+
+        city_names = {c['name'] for c in cities}
+        if city not in city_names:
+            raise serializers.ValidationError({'city': 'City not found for state/country.'})
+
+        return data
+
     def create(self, validated_data):
         from django.utils import timezone
         from datetime import timedelta
@@ -60,7 +95,7 @@ class TicketStatusUpdateSerializer(serializers.ModelSerializer):
             'OPEN': ['ASSIGNED'],
             'ASSIGNED': ['IN_PROGRESS'],
             'IN_PROGRESS': ['RESOLVED'],
-            'RESOLVED': ['CLOSED'],
+            # RESOLVED → CLOSED is supervisor-only (via the force_close action)
         }
         allowed = valid_transitions.get(ticket.status, [])
         if value not in allowed:

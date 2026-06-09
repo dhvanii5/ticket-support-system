@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Ticket(models.Model):
@@ -38,7 +39,7 @@ class Ticket(models.Model):
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
 
-    last_action_at = models.DateTimeField(auto_now_add=True)
+    last_action_at = models.DateTimeField(default=timezone.now)
     escalation_deadline = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
