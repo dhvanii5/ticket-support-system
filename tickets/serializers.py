@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Ticket
 from accounts.serializers import UserSerializer
 
+
 class TicketSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
     assigned_to = UserSerializer(read_only=True)
@@ -16,25 +17,26 @@ class TicketSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['status', 'is_escalated', 'created_by', 'last_action_at']
 
+
 class TicketCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'title', 'description', 'priority', 'country', 'state', 'city']
 
-    def validate(self, data):
-        country = data.get('country')
-        state = data.get('state')
-        city = data.get('city')
+    def validate_country(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Country is required.")
+        return value.strip()
 
-        if state and country and state.country != country:
-            raise serializers.ValidationError(
-                "State does not belong to the selected country."
-            )
-        if city and state and city.state != state:
-            raise serializers.ValidationError(
-                "City does not belong to the selected state."
-            )
-        return data
+    def validate_state(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("State is required.")
+        return value.strip()
+
+    def validate_city(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("City is required.")
+        return value.strip()
 
     def create(self, validated_data):
         from django.utils import timezone
@@ -45,6 +47,7 @@ class TicketCreateSerializer(serializers.ModelSerializer):
             escalation_deadline=timezone.now() + timedelta(hours=24)
         )
         return ticket
+
 
 class TicketStatusUpdateSerializer(serializers.ModelSerializer):
     class Meta:

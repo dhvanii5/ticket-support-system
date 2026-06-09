@@ -1,22 +1,5 @@
 from django.db import models
 
-class Country(models.Model):
-    name = models.CharField(max_length=100)
-    code = models.CharField(max_length=5)
-
-    def __str__(self):
-        return self.name
-
-class State(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='states')
-
-    def __str__(self):
-        return f"{self.name}, {self.country.name}"
-
-class City(models.Model):
-    name = models.CharField(max_length=100)
-    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='cities')
-
-    def __str__(self):
-        return f"{self.name}, {self.state.name}"
+# Location data is now served dynamically via the CountriesNow API.
+# See locations/services.py for the proxy + caching implementation.
+# There are no local Country, State, or City database tables.

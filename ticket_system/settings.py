@@ -1,13 +1,15 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = "django-insecure-eg=^o7qz2xz+c@=iz3_+$m2i5s*8sf^t$nv-=s-8as0@zq07m6"
-
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# ---------------------------------------------------------------------------
+# Security — loaded from .env (never hardcoded)
+# ---------------------------------------------------------------------------
+SECRET_KEY = config("SECRET_KEY")
+DEBUG = config("DEBUG", default=False, cast=bool)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -20,7 +22,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "django_filters",
-    "django_celery_beat",
     # local apps
     "accounts",
     "tickets",
@@ -57,21 +58,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ticket_system.wsgi.application"
 
-# PostgreSQL
+# ---------------------------------------------------------------------------
+# Database — credentials loaded from .env
+# ---------------------------------------------------------------------------
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ticket_db",
-        "USER": "ticket_user",
-        "PASSWORD": "Dhvani@5225",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": config("DB_NAME"),
+        "USER": config("DB_USER"),
+        "PASSWORD": config("DB_PASSWORD"),
+        "HOST": config("DB_HOST", default="localhost"),
+        "PORT": config("DB_PORT", default="5432"),
     }
 }
 
 AUTH_USER_MODEL = "accounts.User"
 
+# ---------------------------------------------------------------------------
 # DRF
+# ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -84,16 +89,14 @@ REST_FRAMEWORK = {
     ],
 }
 
+# ---------------------------------------------------------------------------
 # JWT
+# ---------------------------------------------------------------------------
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
-
-# Celery
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -102,33 +105,41 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# ---------------------------------------------------------------------------
+# Location API (CountriesNow proxy) — loaded from .env
+# ---------------------------------------------------------------------------
+LOCATION_API_BASE = config("LOCATION_API_BASE", default="https://countriesnow.space/api/v0.1")
+LOCATION_CACHE_TTL = config("LOCATION_CACHE_TTL", default=86400, cast=int)
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": str(BASE_DIR / ".django_cache"),
+        "TIMEOUT": LOCATION_CACHE_TTL,
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Internationalisation
+# ---------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ---------------------------------------------------------------------------
+# Swagger
+# ---------------------------------------------------------------------------
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
         }
     },
-    'USE_SESSION_AUTH': False,
-    'JSON_EDITOR': True,
-}
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
-from celery.schedules import crontab
-
-CELERY_BEAT_SCHEDULE = {
-    'escalate-stale-tickets': {
-        'task': 'tickets.tasks.escalate_stale_tickets',
-        'schedule': crontab(minute='*/30'),
-    },
+    "USE_SESSION_AUTH": False,
+    "JSON_EDITOR": True,
 }

@@ -14,17 +14,20 @@ class TicketViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Ticket.objects.none()
+            
         user = self.request.user
-        if user.role == 'USER':
+        if getattr(user, 'role', None) == 'USER':
             return Ticket.objects.filter(created_by=user).select_related(
-                'created_by', 'assigned_to', 'country', 'state', 'city'
+                'created_by', 'assigned_to'
             )
         if user.role == 'AGENT':
             return Ticket.objects.filter(assigned_to=user).select_related(
-                'created_by', 'assigned_to', 'country', 'state', 'city'
+                'created_by', 'assigned_to'
             )
         return Ticket.objects.all().select_related(
-            'created_by', 'assigned_to', 'country', 'state', 'city'
+            'created_by', 'assigned_to'
         )
 
     def get_serializer_class(self):
@@ -96,7 +99,7 @@ class TicketViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsSupervisor])
     def escalated(self, request):
         tickets = Ticket.objects.filter(is_escalated=True).select_related(
-            'created_by', 'assigned_to', 'country', 'state', 'city'
+            'created_by', 'assigned_to'
         )
         return Response(TicketSerializer(tickets, many=True).data)
 

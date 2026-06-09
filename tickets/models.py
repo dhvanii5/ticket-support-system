@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from locations.models import Country, State, City
+
 
 class Ticket(models.Model):
     STATUS_CHOICES = [
@@ -31,9 +31,12 @@ class Ticket(models.Model):
         null=True, blank=True, related_name='assigned_tickets'
     )
 
-    country = models.ForeignKey(Country, on_delete=models.PROTECT)
-    state = models.ForeignKey(State, on_delete=models.PROTECT)
-    city = models.ForeignKey(City, on_delete=models.PROTECT)
+    # Location stored as plain text — sourced from CountriesNow API via the
+    # /api/locations/ endpoints.  No FK constraints; values are the display
+    # names returned by those endpoints (e.g. "India", "Gujarat", "Surat").
+    country = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
 
     last_action_at = models.DateTimeField(auto_now_add=True)
     escalation_deadline = models.DateTimeField(null=True, blank=True)

@@ -1,0 +1,150 @@
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+share/python-wheels/
+MANIFEST
+
+# =============================================================================
+# Virtual Environment
+# =============================================================================
+venv/
+env/
+ENV/
+.venv/
+.env/
+Pipfile.lock
+
+# =============================================================================
+# Django
+# =============================================================================
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Django static & media files (collected for production)
+/static/
+/staticfiles/
+/mediafiles/
+/media/
+
+# =============================================================================
+# Environment Variables — NEVER commit secrets
+# =============================================================================
+.env
+.env.*
+!.env.example
+
+# =============================================================================
+# Django Cache (CountriesNow API response cache)
+# =============================================================================
+.django_cache/
+
+# =============================================================================
+# Database dumps & backups
+# =============================================================================
+*.sql
+*.dump
+*.bak
+
+# =============================================================================
+# IDE & Editors
+# =============================================================================
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm / JetBrains
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Emacs
+*.swp
+*.swo
+*~
+\#*\#
+.\#*
+
+# =============================================================================
+# OS-generated files
+# =============================================================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Linux
+*~
+
+# =============================================================================
+# Testing & Coverage
+# =============================================================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+nosetests.xml
+junit.xml
+
+# =============================================================================
+# Jupyter Notebooks (if ever used)
+# =============================================================================
+.ipynb_checkpoints/
+
+# =============================================================================
+# Miscellaneous
+# =============================================================================
+*.pid
+*.seed
+*.pid.lock
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+.pytype/

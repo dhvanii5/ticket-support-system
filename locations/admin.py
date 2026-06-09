@@ -1,6 +1,4 @@
 from django.contrib import admin
-from .models import Country, State, City
 
-admin.site.register(Country)
-admin.site.register(State)
-admin.site.register(City)
+# No location models to register — data is served via CountriesNow API proxy.
+# See locations/services.py.

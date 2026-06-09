@@ -1,17 +1,5 @@
 from rest_framework import serializers
-from .models import Country, State, City
 
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = ['id', 'name', 'code']
-
-class StateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = State
-        fields = ['id', 'name', 'country']
-
-class CitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = City
-        fields = ['id', 'name', 'state']
+# Serializers are no longer needed for the location app.
+# The views in locations/views.py return plain Python dicts directly from
+# the LocationService, which are serialized by DRF's Response automatically.

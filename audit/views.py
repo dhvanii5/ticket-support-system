@@ -8,12 +8,15 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return AuditLog.objects.none()
+            
         user = self.request.user
         ticket_id = self.request.query_params.get('ticket_id')
         qs = AuditLog.objects.select_related('ticket', 'performed_by')
         if ticket_id:
             qs = qs.filter(ticket_id=ticket_id)
-        if user.role == 'USER':
+        if getattr(user, 'role', None) == 'USER':
             qs = qs.filter(ticket__created_by=user)
         elif user.role == 'AGENT':
             qs = qs.filter(ticket__assigned_to=user)

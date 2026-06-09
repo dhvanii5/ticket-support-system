@@ -1,9 +1,8 @@
-from rest_framework.routers import DefaultRouter
-from .views import CountryViewSet, StateViewSet, CityViewSet
+from django.urls import path
+from .views import CountryListView, StateListView, CityListView
 
-router = DefaultRouter()
-router.register('countries', CountryViewSet)
-router.register('states', StateViewSet, basename='state')
-router.register('cities', CityViewSet, basename='city')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path("countries/", CountryListView.as_view(), name="location-countries"),
+    path("states/", StateListView.as_view(), name="location-states"),
+    path("cities/", CityListView.as_view(), name="location-cities"),
+]
