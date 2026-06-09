@@ -44,7 +44,7 @@ async def escalation_loop():
             logger.error(f"Error in escalation task: {e}")
         
         # Run every 30 minutes
-        await asyncio.sleep(30 * 60)
+        await asyncio.sleep(60)
 
 def start_escalation_task():
     def run_loop():

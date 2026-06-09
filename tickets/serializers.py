@@ -44,7 +44,7 @@ class TicketCreateSerializer(serializers.ModelSerializer):
         ticket = Ticket.objects.create(
             **validated_data,
             created_by=self.context['request'].user,
-            escalation_deadline=timezone.now() + timedelta(hours=24)
+            escalation_deadline=timezone.now() + timedelta(minutes=2)
         )
         return ticket
 
