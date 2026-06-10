@@ -114,8 +114,11 @@ class TicketViewSet(viewsets.ModelViewSet):
             agent = User.objects.get(id=agent_id, role='AGENT')
         except User.DoesNotExist:
             return Response({'error': 'Agent not found'}, status=404)
+        from datetime import timedelta
         ticket.assigned_to = agent
         ticket.last_action_at = timezone.now()
+        # Reset escalation clock for the new agent
+        ticket.escalation_deadline = timezone.now() + timedelta(minutes=2)
         ticket.save()
         AuditLog.objects.create(
             ticket=ticket, performed_by=request.user,

@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Ticket
 from accounts.serializers import UserSerializer
 from locations import services as location_services
-from locations.services import LocationAPIError
+from locations.services import LocationAPIError  # noqa: F401  (used in except clauses below)
 
 
 class TicketSerializer(serializers.ModelSerializer):
