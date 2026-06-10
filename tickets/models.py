@@ -32,9 +32,6 @@ class Ticket(models.Model):
         null=True, blank=True, related_name='assigned_tickets'
     )
 
-    # Location stored as plain text — sourced from CountriesNow API via the
-    # /api/locations/ endpoints.  No FK constraints; values are the display
-    # names returned by those endpoints (e.g. "India", "Gujarat", "Surat").
     country = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     city = models.CharField(max_length=100)

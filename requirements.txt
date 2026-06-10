@@ -1,0 +1,8 @@
+Django==6.0.1
+djangorestframework
+djangorestframework-simplejwt
+drf-yasg
+django-filter
+python-decouple
+psycopg2-binary==2.9.11
+requests==2.32.3
